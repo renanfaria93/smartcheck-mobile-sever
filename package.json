@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engine": {
+    "node": "20"
+  },
   "scripts": {
-    "dev": "node src/sever.js"
+    "start": "node src/sever.js"
   },
   "keywords": [],
   "author": "",
