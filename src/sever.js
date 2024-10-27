@@ -1,7 +1,9 @@
+//sever.js
+
 const express = require("express");
 const dotenv = require("dotenv");
-const supabase = require("./services/supabaseClient");
-const routes = require("./routes");
+const supabase = require("./network/supabaseClient");
+const routes = require("./routes/index");
 
 // Configura variáveis de ambiente
 dotenv.config();
