@@ -1,5 +1,3 @@
-// models/userModel.js
-
 const bcrypt = require("bcrypt");
 const { supabase } = require("../network/supabaseClient");
 
@@ -12,8 +10,27 @@ class User {
     this.confirmation_code = confirmation_code;
   }
 
+  // Método para verificar a existência do e-mail no banco de dados
+  static async checkEmailExists(email) {
+    const { data, error } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email)
+      .single();
+
+    if (data) {
+      throw new Error("O e-mail já está cadastrado.");
+    }
+    if (error) {
+      throw new Error("Erro ao verificar e-mail: " + error.message);
+    }
+  }
+
   // Método estático para criar um novo usuário no banco de dados
   static async create(user) {
+    // Verificações de e-mail
+    await this.checkEmailExists(user.email);
+
     // Hash da senha e geração de código de confirmação
     const hashedPassword = await bcrypt.hash(user.password, 10);
     const confirmationCode = Math.floor(
@@ -37,7 +54,7 @@ class User {
       throw new Error("Erro ao cadastrar usuário: " + error.message);
     }
 
-    return data;
+    return data[0];
   }
 
   // Método estático para atualizar o código de confirmação

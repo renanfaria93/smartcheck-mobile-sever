@@ -2,7 +2,12 @@
 
 const CustomError = require("../utils/customError");
 const UserService = require("../services/userService");
-const nodemailer = require("nodemailer");
+
+// Função auxiliar para validar o formato do e-mail
+const validateEmailFormat = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
 class UserController {
   // Método para registrar um usuário
@@ -15,6 +20,36 @@ class UserController {
         status: "error",
         error: {
           message: "Todos os campos são obrigatórios.",
+        },
+      });
+    }
+
+    // Valida o tamanho do campo `name`
+    if (name.length > 50) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "O nome não pode ter mais de 50 caracteres.",
+        },
+      });
+    }
+
+    // Validação do formato do email
+    if (!validateEmailFormat(email)) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "O formato do e-mail é inválido.",
+        },
+      });
+    }
+
+    // Validação do tamanho da senha
+    if (password.length < 6) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "A senha deve ter pelo menos 6 caracteres.",
         },
       });
     }
@@ -41,57 +76,42 @@ class UserController {
     }
   }
 
-  // // Método para reenviar o código de verificação
-  // static async resendCode(req, res) {
-  //   const { email } = req.body;
-
-  //   // Validação dos campos obrigatórios
-  //   if (!email) {
-  //     return res.status(400).json({
-  //       status: "error",
-  //       results: "Parametro email inválido",
-  //     });
-  //   }
-
-  //   try {
-  //     // Reenviar o código de confirmação
-  //     await UserService.resendConfirmationCode(email);
-
-  //     return res.status(200).json({
-  //       status: "success",
-  //       results: {
-  //         message:
-  //           "Um novo código de confirmação foi enviado para o seu e-mail.",
-  //       },
-  //     });
-  //   } catch (error) {
-  //     const statusCode = error instanceof CustomError ? error.statusCode : 500;
-  //     return res.status(statusCode).json({
-  //       status: "error",
-  //       results: {
-  //         message: error.message || "Ocorreu um erro desconhecido.",
-  //       },
-  //     });
-  //   }
-  // }
-
   // Método para validar o email através do código
   static async validateEmail(req, res) {
     const { email, code } = req.body;
 
-    //Validar o campos
+    // Validação dos campos obrigatórios
     if (!email || !code) {
       return res.status(400).json({
         status: "error",
         error: {
-          message: "Parâmetro código ou email inválido",
+          message: "Parâmetro código ou email inválido.",
+        },
+      });
+    }
+
+    // Validação do formato do email
+    if (!validateEmailFormat(email)) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "O formato do e-mail é inválido.",
+        },
+      });
+    }
+
+    // Validação do comprimento do código de confirmação (6 caracteres)
+    if (code.length !== 6) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "O código de confirmação deve ter 6 caracteres.",
         },
       });
     }
 
     try {
       const data = await UserService.validateEmail(email, code);
-      // Resposta de sucesso
       return res.status(200).json({
         status: "success",
         results: data,
@@ -116,7 +136,17 @@ class UserController {
       return res.status(400).json({
         status: "error",
         error: {
-          message: "Parâmetro de email ou senha inválidos",
+          message: "Parâmetro de email ou senha inválidos.",
+        },
+      });
+    }
+
+    // Validação do formato do email
+    if (!validateEmailFormat(email)) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "O formato do e-mail é inválido.",
         },
       });
     }
@@ -142,7 +172,6 @@ class UserController {
         results: data,
       });
     } catch (error) {
-      // Tratar erro de email ou senha incorretos
       return res.status(404).json({
         status: "error",
         error: {
