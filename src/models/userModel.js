@@ -16,7 +16,7 @@ class User {
       .from("users")
       .select("id")
       .eq("email", email)
-      .single();
+      .maybeSingle();
 
     if (data) {
       throw new Error("O e-mail já está cadastrado.");

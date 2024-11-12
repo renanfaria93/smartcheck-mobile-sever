@@ -82,7 +82,6 @@ class Task {
           image: task.image,
           general_description: task.generalDescription,
           security_description: task.securityDescription,
-          status: task.status,
         },
       ])
       .select();
