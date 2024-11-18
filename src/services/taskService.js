@@ -32,6 +32,18 @@ class TaskService {
 
   //Método para criar uma nova tarefa
   static async createTask(taskData) {
+    // Verificações de existência e vínculo antes da inserção
+    await Task.checkActivityExists(taskData.activityId);
+
+    // Se o usuário for fornecido, verifica vínculo e existência
+    if (taskData.userId) {
+      await Task.checkUserExists(taskData.userId);
+      await Task.checkUserActivityLink(taskData.userId, taskData.activityId);
+    } else {
+      // Caso contrário, obtém o usuário com menos tarefas
+      taskData.userId = await Task.getUserWithLeastTasks(taskData.activityId);
+    }
+
     return await Task.create({
       title: taskData.title,
       userId: taskData.userId,

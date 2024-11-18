@@ -69,7 +69,6 @@ class TaskController {
     // Validação dos campos obrigatórios
     if (
       !title ||
-      !userId ||
       !activityId ||
       !tag ||
       !dueDate ||
@@ -99,11 +98,19 @@ class TaskController {
       });
     }
 
-    // Verifica se userId e activityId são UUIDs válidos
-    if (!validateUUID(userId) || !validateUUID(activityId)) {
+    // Verifica se activityId é UUID válido
+    if (!validateUUID(activityId)) {
       return res.status(400).json({
         status: "error",
-        error: { message: "userId e activityId devem ser UUIDs válidos." },
+        error: { message: "activityId deve ser UUID válido." },
+      });
+    }
+
+    // Verifica se activityId é UUID válido
+    if (userId && !validateUUID(userId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "userId deve ser UUID válido." },
       });
     }
 

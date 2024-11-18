@@ -63,13 +63,21 @@ class Task {
     }
   }
 
+  // Método para obter o usuário com menos tarefas pendentes ou atrasadas para uma atividade específica
+  static async getUserWithLeastTasks(activityId) {
+    const { data, error } = await supabase.rpc("get_user_with_least_tasks", {
+      p_activity_id: activityId,
+    });
+
+    if (error || !data) {
+      throw new Error("Nenhum usuário disponível para essa atividade.");
+    }
+
+    return data; // Retorna o user_id do usuário com menos tarefas
+  }
+
   // Método estático para criar uma nova tarefa
   static async create(task) {
-    // Verificações de existência e vínculo antes da inserção
-    await this.checkUserExists(task.userId);
-    await this.checkActivityExists(task.activityId);
-    await this.checkUserActivityLink(task.userId, task.activityId);
-
     const { data, error } = await supabase
       .from("tasks")
       .insert([
