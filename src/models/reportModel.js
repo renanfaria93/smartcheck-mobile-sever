@@ -46,10 +46,6 @@ class Report {
 
   // Método estático para criar um reporte, incluindo verificações das chaves estrangeiras
   static async create(report) {
-    // Verifica a existência do task_id e problem_id antes da inserção
-    await this.checkTaskExists(report.taskId);
-    await this.checkProblemExists(report.problemId);
-
     const { data, error } = await supabase
       .from("reports")
       .insert([

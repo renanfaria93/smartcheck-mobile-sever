@@ -103,6 +103,40 @@ class User {
 
     return data;
   }
+
+  // Método estático para encontrar uma tarefa em processo por ID de usuário
+  static async findTaskInProgressById(userId) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("in_progress", true)
+      .limit(1);
+
+    if (error) {
+      throw new Error("Erro ao verificar log do usuário: " + error.message);
+    }
+
+    return data[0];
+  }
+
+  // Método estático para atualizar um registro na tabela user_task_log
+  static async updateTaskLogStatus(id) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .update({
+        finished_at: new Date().toISOString(),
+        in_progress: false,
+      })
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      throw new Error("Erro ao atualizar o registro: " + error.message);
+    }
+
+    return data;
+  }
 }
 
 module.exports = User;

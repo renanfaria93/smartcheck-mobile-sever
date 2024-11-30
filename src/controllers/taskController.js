@@ -193,6 +193,116 @@ class TaskController {
       });
     }
   }
+
+  // Método para buscar dados de uma tarefa
+  static async getTaskProgress(req, res) {
+    const { taskLogId } = req.params;
+
+    // Validação do UUID do taskId
+    if (!validateUUID(taskLogId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "O taskLogId deve ser um UUID válido." },
+      });
+    }
+
+    try {
+      const taskLog = await TaskService.getTaskProgress(taskLogId);
+
+      return res.status(200).json({
+        status: "success",
+        results: taskLog,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: { message: error.message || "Ocorreu um erro desconhecido." },
+      });
+    }
+  }
+
+  // Método para criar uma tarefa
+  static async startTask(req, res) {
+    const { taskId, userId } = req.body;
+
+    // Validação dos campos obrigatórios
+    if (!taskId || !userId) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "Todos os campos são obrigatórios." },
+      });
+    }
+
+    // Verifica se taskId é UUID válido
+    if (taskId && !validateUUID(taskId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "taskId deve ser UUID válido." },
+      });
+    }
+
+    // Verifica se userId é UUID válido
+    if (userId && !validateUUID(userId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "userId deve ser UUID válido." },
+      });
+    }
+
+    try {
+      // Atualiza status da Tarefa
+      const taskLog = await TaskService.startTask({ taskId, userId });
+
+      return res.status(201).json({
+        status: "success",
+        results: taskLog,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: { message: error.message || "Ocorreu um erro desconhecido." },
+      });
+    }
+  }
+
+  // Método para criar uma tarefa
+  static async finishTask(req, res) {
+    const { taskLogId, imageConfirmation } = req.body;
+
+    // Validação dos campos obrigatórios
+    if (!taskLogId || !imageConfirmation) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "Todos os campos são obrigatórios." },
+      });
+    }
+
+    // Verifica se taskId é UUID válido
+    if (taskLogId && !validateUUID(taskLogId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "taskId deve ser UUID válido." },
+      });
+    }
+
+    try {
+      // Atualiza status da Tarefa
+      await TaskService.finishTask({ taskLogId, imageConfirmation });
+
+      return res.status(201).json({
+        status: "success",
+        results: "OK",
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: { message: error.message || "Ocorreu um erro desconhecido." },
+      });
+    }
+  }
 }
 
 module.exports = TaskController;

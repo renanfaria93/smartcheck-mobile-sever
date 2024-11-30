@@ -87,11 +87,26 @@ class UserService {
       await UserService.#sendValidationCode(user.email, user.confirmation_code);
       return null;
     }
-    return {
-      id: user.id,
-      name: user.name,
-      role: user.role,
+
+    // Verifica se o usuário possui tarefa ativa
+    const taskLog = await User.findTaskInProgressById(user.id);
+
+    // Monta o retorno balanceado
+    const response = {
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+      },
+      taskLog: taskLog
+        ? {
+            id: taskLog.id,
+            task_id: taskLog.task_id,
+          }
+        : null,
     };
+
+    return response;
   }
 }
 

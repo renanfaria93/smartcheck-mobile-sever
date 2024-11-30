@@ -30,6 +30,11 @@ class TaskService {
     return await Task.findById(taskId);
   }
 
+  //Método para buscar o progresso da tarefa pelo ID
+  static async getTaskProgress(taskLogId) {
+    return await Task.findTaskInProgressById(taskLogId);
+  }
+
   //Método para criar uma nova tarefa
   static async createTask(taskData) {
     // Verificações de existência e vínculo antes da inserção
@@ -54,6 +59,23 @@ class TaskService {
       generalDescription: taskData.generalDescription,
       securityDescription: taskData.securityDescription,
     });
+  }
+
+  //Método para iniciar uma tarefa
+  static async startTask(data) {
+    await Task.checkTaskBeforeToStart(data.taskId, data.userId);
+    return await Task.createTaskLog(data.taskId, data.userId);
+  }
+
+  //Método para buscar o progresso da tarefa pelo ID
+  static async finishTask(data) {
+    await Task.checkLogExists(data.taskLogId);
+    await Task.checkIfTaskInProgress(data.taskLogId);
+
+    return await Task.updateTaskLogStatus(
+      data.taskLogId,
+      data.imageConfirmation
+    );
   }
 }
 

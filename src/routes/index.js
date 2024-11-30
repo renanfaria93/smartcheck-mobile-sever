@@ -1,5 +1,3 @@
-// routes/userRoutes.js
-
 const express = require("express");
 const UserController = require("../controllers/userController");
 const TaskController = require("../controllers/taskController");
@@ -14,28 +12,37 @@ router.post("/auth/register", UserController.register);
 // Rota para reenviar código de confirmação
 router.post("/auth/validate-email", UserController.validateEmail);
 
-// Rota para reenviar código de confirmação
-router.post("/auth/login", UserController.login);
+// Rota para login de usuários
+router.post("/sign-in", UserController.login);
 
 // Rota para buscar tarefas
 router.get("/tasks", TaskController.getTasks);
 
 // Rota para buscar tarefas de um usuário
-router.get("/tasks/:userId", TaskController.getTasksFromUser);
+router.get("/tasks/user/:userId", TaskController.getTasksFromUser);
 
 // Rota para criar tarefa
-router.post("/task", TaskController.createTask);
+router.post("/tasks", TaskController.createTask);
 
 // Rota para buscar dados de uma tarefa pelo id
-router.get("/task/:taskId", TaskController.getTask);
+router.get("/tasks/:taskId", TaskController.getTask);
+
+// Rota para buscar o progresso de uma tarefa
+router.get("/tasks/:taskLogId/progress", TaskController.getTaskProgress);
+
+// Rota para finalizar tarefa
+router.post("/tasks/start", TaskController.startTask);
+
+// Rota para finalizar tarefa
+router.post("/tasks/finish", TaskController.finishTask);
 
 // Rota para buscar os tipos de atividades
-router.get("/activitys", ActivityController.getActivitys);
+router.get("/activities", ActivityController.getActivitys);
 
 // Rota para buscar a lista de problemas
-router.get("/reports/problems", ReportController.getProblems);
+router.get("/problems", ReportController.getProblems);
 
-// Rota para criar um reporte
-router.post("/report", ReportController.createReport);
+// Rota para criar um relatório
+router.post("/reports", ReportController.createReport);
 
 module.exports = router;

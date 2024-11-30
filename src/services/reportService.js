@@ -10,6 +10,10 @@ class ReportService {
 
   // Método para criar um reporte
   static async createReport(reportData) {
+    // Verifica a existência do task_id e problem_id antes da inserção
+    await Report.checkTaskExists(reportData.taskId);
+    await Report.checkProblemExists(reportData.problemId);
+
     return await Report.create({
       taskId: reportData.taskId,
       problemId: reportData.problemId,

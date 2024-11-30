@@ -126,6 +126,31 @@ class Task {
     return data;
   }
 
+  // Método para verificar a tarefa antes de iniciar
+  static async checkTaskBeforeToStart(taskId, userId) {
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("id", taskId)
+      .single();
+
+    if (error || !data) {
+      throw new Error("Erro ao buscar os dados da tarefa.");
+    }
+
+    if (data.status == "reported") {
+      throw new Error("Esta tarefa esta reportada, não é possivel iniciar");
+    }
+
+    if (data.status == "finished") {
+      throw new Error("Esta tarefa esta finalizada");
+    }
+
+    if (data.user_id != userId) {
+      throw new Error("Esta tarefa não pertence a este usuário");
+    }
+  }
+
   // Método estático para atualizar uma tarefa
   static async update(taskId, updatedData) {
     const { data, error } = await supabase
@@ -162,12 +187,105 @@ class Task {
       .from("tasks")
       .select("*")
       .eq("id", taskId)
-      .single();
+      .limit(1);
 
     if (error) {
       throw new Error("Erro ao buscar a tarefa: " + error.message);
     }
 
+    return data[0];
+  }
+
+  // Método estático para encontrar uma tarefa em processo por ID de usuário
+  static async findTaskInProgressById(taskLogId) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .select("*")
+      .eq("id", taskLogId)
+      .single();
+
+    if (error || !data) {
+      throw new Error("Erro ao verificar log da tarefa: " + error.message);
+    }
+
+    if (!data.in_progress) {
+      throw new Error("Esta tarefa está finalizada.");
+    }
+
+    return data;
+  }
+
+  // Método estático para verificar se um log existe pelo ID
+  static async checkLogExists(id) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      throw new Error("Esta tarefa ainda não foi iniciada");
+    }
+
+    return data;
+  }
+
+  // Método estático para verificar se a tarefa está em progresso
+  static async checkIfTaskInProgress(id) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .select("in_progress")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      throw new Error("Erro ao verificar a tarefa: " + error.message);
+    }
+
+    // Verifica o valor do campo in_progress
+    if (!data || data.in_progress === false) {
+      throw new Error("Esta tarefa já foi finalizada");
+    }
+
+    return data;
+  }
+
+  // Método para iniciar uma tarefa
+  static async createTaskLog(taskId, userId) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .insert([
+        {
+          task_id: taskId,
+          user_id: userId,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error("Erro ao criar o iniciar a tarefa: " + error.message);
+    }
+
+    return data;
+  }
+
+  // Método para atualizar o log da tarefa
+  static async updateTaskLogStatus(id, image) {
+    const { data, error } = await supabase
+      .from("user_task_log")
+      .update({
+        image: image,
+        finished_at: new Date().toISOString(),
+        in_progress: false,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error("Erro ao atualizar o registro: " + error.message);
+    }
     return data;
   }
 }
