@@ -180,6 +180,39 @@ class UserController {
       });
     }
   }
+
+  // Método buscar status do usuário
+  static async me(req, res) {
+    const { userId } = req.params;
+
+    // Validação dos campos obrigatórios
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "Parâmetro userId inválido.",
+        },
+      });
+    }
+
+    try {
+      // Chama o serviço de login
+      const data = await UserService.me(userId);
+
+      return res.status(200).json({
+        status: "success",
+        results: data,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: {
+          message: error.message || "Ocorreu um erro desconhecido.",
+        },
+      });
+    }
+  }
 }
 
 module.exports = UserController;

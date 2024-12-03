@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 5000;
 
 // Middleware para parsear JSON
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 // Rotas
 app.use("/api", routes);

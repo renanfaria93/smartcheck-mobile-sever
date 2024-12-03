@@ -88,9 +88,6 @@ class UserService {
       return null;
     }
 
-    // Verifica se o usuário possui tarefa ativa
-    const taskLog = await User.findTaskInProgressById(user.id);
-
     // Monta o retorno balanceado
     const response = {
       user: {
@@ -98,6 +95,18 @@ class UserService {
         name: user.name,
         role: user.role,
       },
+    };
+
+    return response;
+  }
+
+  // Método para buscar status do usuários
+  static async me(userId) {
+    // Verifica se o usuário possui tarefa ativa
+    const taskLog = await User.findTaskInProgressById(userId);
+
+    // Monta o retorno balanceado
+    const response = {
       taskLog: taskLog
         ? {
             id: taskLog.id,
