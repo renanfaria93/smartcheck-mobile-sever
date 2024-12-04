@@ -155,7 +155,17 @@ class Task {
   static async update(taskId, updatedData) {
     const { data, error } = await supabase
       .from("tasks")
-      .update(updatedData)
+      .update([
+        {
+          title: updatedData.title,
+          activity_id: updatedData.activityId,
+          tag: updatedData.tag,
+          due_date: updatedData.dueDate,
+          image: updatedData.image,
+          general_description: updatedData.generalDescription,
+          security_description: updatedData.securityDescription,
+        },
+      ])
       .eq("id", taskId)
       .select();
 

@@ -61,6 +61,14 @@ class TaskService {
     });
   }
 
+  //Método para criar uma nova tarefa
+  static async updateTask(taskId, taskData) {
+    // Verificações de existência e vínculo antes da inserção
+    await Task.checkActivityExists(taskData.activityId);
+
+    return await Task.update(taskId, taskData);
+  }
+
   //Método para iniciar uma tarefa
   static async startTask(data) {
     await Task.checkTaskBeforeToStart(data.taskId, data.userId);

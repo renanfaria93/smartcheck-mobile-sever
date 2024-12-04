@@ -158,6 +158,111 @@ class TaskController {
     }
   }
 
+  // Método para criar uma tarefa
+  static async updateTask(req, res) {
+    const { taskId } = req.params;
+
+    const {
+      title,
+      activityId,
+      tag,
+      dueDate,
+      image,
+      generalDescription,
+      securityDescription,
+    } = req.body;
+
+    // Validação dos campos obrigatórios
+    if (!taskId) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "Parâmetro taskId inválido." },
+      });
+    }
+
+    // Validação dos campos obrigatórios
+    if (
+      !title ||
+      !activityId ||
+      !tag ||
+      !dueDate ||
+      !image ||
+      !generalDescription ||
+      !securityDescription
+    ) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "Todos os campos são obrigatórios." },
+      });
+    }
+
+    // Verifica se o title tem comprimento máximo de 50 caracteres
+    if (title.length > 50) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "O título não pode ter mais de 50 caracteres." },
+      });
+    }
+
+    // Verifica se a tag tem comprimento máximo de 30 caracteres
+    if (tag.length > 30) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "A tag não pode ter mais de 30 caracteres." },
+      });
+    }
+
+    // Verifica se activityId é UUID válido
+    if (!validateUUID(activityId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "activityId deve ser UUID válido." },
+      });
+    }
+
+    // Verifica se dueDate está em um formato de timestamp válido
+    const dueDateTimestamp = new Date(dueDate);
+    if (isNaN(dueDateTimestamp.getTime())) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "dueDate deve ser uma data válida." },
+      });
+    }
+
+    // Verifica se dueDate não é uma data no passado
+    const now = new Date();
+    if (dueDateTimestamp < now) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "dueDate não pode ser uma data no passado." },
+      });
+    }
+
+    try {
+      // Cria a tarefa
+      const task = await TaskService.updateTask(taskId, {
+        title,
+        activityId,
+        tag,
+        dueDate,
+        image,
+        generalDescription,
+        securityDescription,
+      });
+
+      return res.status(201).json({
+        status: "success",
+        results: "OK",
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: { message: error.message || "Ocorreu um erro desconhecido." },
+      });
+    }
+  }
+
   // Método para buscar dados de uma tarefa
   static async getTask(req, res) {
     const { taskId } = req.params;

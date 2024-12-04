@@ -27,6 +27,9 @@ router.get("/tasks/user/:userId", TaskController.getTasksFromUser);
 // Rota para criar tarefa
 router.post("/tasks", TaskController.createTask);
 
+// Rota para atualizar os dados de uma tarefa
+router.post("/tasks/:taskId/update", TaskController.updateTask);
+
 // Rota para buscar dados de uma tarefa pelo id
 router.get("/tasks/:taskId", TaskController.getTask);
 
