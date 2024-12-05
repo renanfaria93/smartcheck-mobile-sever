@@ -26,6 +26,20 @@ class User {
     }
   }
 
+  // Método para verificar a existência do usuário
+  static async checkUserExists(userId) {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      throw new Error("Usuário (userId) não encontrado.");
+    }
+    return data;
+  }
+
   // Método estático para criar um novo usuário no banco de dados
   static async create(user) {
     // Verificações de e-mail
@@ -55,6 +69,36 @@ class User {
     }
 
     return data[0];
+  }
+
+  // Método estático para criar um novo usuário no banco de dados
+  static async getUsers() {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("is_verified", true)
+      .order("name", { ascending: true });
+
+    if (error) {
+      throw new Error("Erro ao buscar os usuários: " + error.message);
+    }
+
+    return data;
+  }
+
+  // Método estático para criar um novo usuário no banco de dados
+  static async getUserActivity(userId) {
+    const { data, error } = await supabase
+      .from("user_activitys")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data;
   }
 
   // Método estático para atualizar o código de confirmação

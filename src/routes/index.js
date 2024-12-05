@@ -15,6 +15,12 @@ router.post("/auth/validate-email", UserController.validateEmail);
 // Rota para login de usuários
 router.post("/sign-in", UserController.login);
 
+// Rota para buscar usuários
+router.get("/users", UserController.getUsers);
+
+// Rota para buscar dados do usuário
+router.get("/users/:userId/data", UserController.getUserData);
+
 // Rota para buscar status do usuário
 router.get("/me/:userId", UserController.me);
 

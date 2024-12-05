@@ -213,6 +213,14 @@ class TaskController {
     }
 
     // Verifica se activityId é UUID válido
+    if (!validateUUID(taskId)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "taskId deve ser UUID válido." },
+      });
+    }
+
+    // Verifica se activityId é UUID válido
     if (!validateUUID(activityId)) {
       return res.status(400).json({
         status: "error",

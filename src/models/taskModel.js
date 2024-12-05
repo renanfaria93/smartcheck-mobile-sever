@@ -167,7 +167,8 @@ class Task {
         },
       ])
       .eq("id", taskId)
-      .select();
+      .select()
+      .single();
 
     if (error) {
       throw new Error("Erro ao atualizar tarefa: " + error.message);

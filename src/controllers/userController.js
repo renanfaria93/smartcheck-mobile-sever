@@ -181,6 +181,58 @@ class UserController {
     }
   }
 
+  // Método buscar usuários
+  static async getUsers(req, res) {
+    try {
+      // Chama o serviço de login
+      const users = await UserService.getUsers();
+
+      return res.status(200).json({
+        status: "success",
+        results: users,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: {
+          message: error.message || "Ocorreu um erro desconhecido.",
+        },
+      });
+    }
+  }
+
+  // Método buscar usuários
+  static async getUserData(req, res) {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "Parâmetro userId inválido.",
+        },
+      });
+    }
+    try {
+      // Chama o serviço de usuário
+      const userData = await UserService.getUserData(userId);
+
+      return res.status(200).json({
+        status: "success",
+        results: userData,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: {
+          message: error.message || "Ocorreu um erro desconhecido.",
+        },
+      });
+    }
+  }
+
   // Método buscar status do usuário
   static async me(req, res) {
     const { userId } = req.params;

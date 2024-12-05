@@ -100,6 +100,45 @@ class UserService {
     return response;
   }
 
+  // Método para buscar os usuários
+  static async getUsers() {
+    // Verifica se o email esta cadastrado
+    const users = await User.getUsers();
+
+    // Filtra os campos necessários antes de retornar
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    }));
+  }
+
+  // Método para buscar os usuários
+  static async getUserData(userId) {
+    // Verifica se o usuário existe
+    const user = await User.checkUserExists(userId);
+    // Busca função do usuário
+    const userActivity = await User.getUserActivity(userId);
+
+    // Monta o retorno balanceado
+    const response = {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      assignment: userActivity
+        ? {
+            id: userActivity.id,
+            activity: userActivity.activity_id,
+          }
+        : null,
+    };
+
+    return response;
+  }
+
   // Método para buscar status do usuários
   static async me(userId) {
     // Verifica se o usuário possui tarefa ativa
