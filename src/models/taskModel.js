@@ -103,7 +103,10 @@ class Task {
 
   // Método estático para buscar todas as tarefas
   static async getTasks() {
-    const { data, error } = await supabase.from("tasks").select("*");
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("title", { ascending: true });
 
     if (error) {
       throw new Error("Erro ao buscar as tarefas: " + error.message);
@@ -117,7 +120,8 @@ class Task {
     const { data, error } = await supabase
       .from("tasks")
       .select("*")
-      .eq("user_id", userId);
+      .eq("user_id", userId)
+      .order("title", { ascending: true });
 
     if (error) {
       throw new Error("Erro ao buscar tarefas do usuário: " + error.message);

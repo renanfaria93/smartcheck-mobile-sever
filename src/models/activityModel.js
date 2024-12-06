@@ -7,7 +7,10 @@ class Activity {
 
   // Método estático para buscar as atividades
   static async getActivitys() {
-    const { data, error } = await supabase.from("activitys").select("*");
+    const { data, error } = await supabase
+      .from("activitys")
+      .select("*")
+      .order("label", { ascending: true });
 
     if (error) {
       throw new Error("Erro ao buscar a lista de atividades: " + error.message);

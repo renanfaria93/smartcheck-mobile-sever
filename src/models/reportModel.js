@@ -35,7 +35,10 @@ class Report {
 
   // Método estático para buscar a lista de problemas
   static async getProblems() {
-    const { data, error } = await supabase.from("problems").select("*");
+    const { data, error } = await supabase
+      .from("problems")
+      .select("*")
+      .order("label", { ascending: true });
 
     if (error) {
       throw new Error("Erro ao buscar os problemas: " + error.message);
