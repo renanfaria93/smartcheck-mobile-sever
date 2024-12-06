@@ -156,6 +156,28 @@ class UserService {
 
     return response;
   }
+
+  // Método para buscar status do usuários
+  static async updateUserData(data) {
+    const user = data.user;
+    const assignment = data.assignment;
+
+    // Verifica se o usuário existe
+    await User.checkUserExists(user.id);
+    // Atualiza Perfil do usuário
+    await User.updateUserRole(user);
+    //verifica se o tipo de atividade existe
+    await User.checkActivityExists(assignment.activity);
+
+    //verifica se esta criando ou alterando a associação de função
+    if (assignment.id) {
+      return await User.updateUserActivity(assignment);
+    } else {
+      await User.createUserAssignment(assignment);
+    }
+
+    return null;
+  }
 }
 
 module.exports = UserService;

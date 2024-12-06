@@ -40,6 +40,20 @@ class User {
     return data;
   }
 
+  // Método para verificar a existência do usuário
+  static async checkActivityExists(activityId) {
+    const { data, error } = await supabase
+      .from("activitys")
+      .select("*")
+      .eq("id", activityId)
+      .single();
+
+    if (error || !data) {
+      throw new Error("Atividade (activityId) não encontrada.");
+    }
+    return data;
+  }
+
   // Método estático para criar um novo usuário no banco de dados
   static async create(user) {
     // Verificações de e-mail
@@ -177,6 +191,61 @@ class User {
 
     if (error) {
       throw new Error("Erro ao atualizar o registro: " + error.message);
+    }
+
+    return data;
+  }
+
+  // Método estático para atualizar um registro na tabela user_task_log
+  static async updateUserRole(userData) {
+    const { data, error } = await supabase
+      .from("users")
+      .update({
+        role: userData.role,
+      })
+      .eq("id", userData.id)
+      .single();
+
+    if (error) {
+      throw new Error(
+        "Erro ao atualizar os dados do usuário: " + error.message
+      );
+    }
+
+    return data;
+  }
+
+  // Método estático para atualizar um registro na tabela user_task_log
+  static async updateUserActivity(assignment) {
+    const { data, error } = await supabase
+      .from("user_activitys")
+      .update({
+        activity_id: assignment.activity,
+      })
+      .eq("id", assignment.id)
+      .single();
+
+    if (error) {
+      throw new Error(
+        "Erro ao atualizar a função do usuário: " + error.message
+      );
+    }
+
+    return data;
+  }
+
+  // Método estático para atualizar um registro na tabela user_task_log
+  static async createUserAssignment(assignment) {
+    const { data, error } = await supabase
+      .from("user_activitys")
+      .insert({
+        user_id: assignment.user,
+        activity_id: assignment.activity,
+      })
+      .select();
+
+    if (error) {
+      throw new Error("Erro ao associar a função do usuário: " + error.message);
     }
 
     return data;

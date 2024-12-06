@@ -21,6 +21,9 @@ router.get("/users", UserController.getUsers);
 // Rota para buscar dados do usuário
 router.get("/users/:userId/data", UserController.getUserData);
 
+// Rota para atualizar os dados de um usuário
+router.post("/users/:userId/update", UserController.updateUserData);
+
 // Rota para buscar status do usuário
 router.get("/me/:userId", UserController.me);
 

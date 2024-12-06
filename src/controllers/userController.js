@@ -2,6 +2,7 @@
 
 const CustomError = require("../utils/customError");
 const UserService = require("../services/userService");
+const { validate: validateUUID } = require("uuid");
 
 // Função auxiliar para validar o formato do e-mail
 const validateEmailFormat = (email) => {
@@ -254,6 +255,104 @@ class UserController {
       return res.status(200).json({
         status: "success",
         results: data,
+      });
+    } catch (error) {
+      const statusCode = error instanceof CustomError ? error.statusCode : 500;
+      return res.status(statusCode).json({
+        status: "error",
+        error: {
+          message: error.message || "Ocorreu um erro desconhecido.",
+        },
+      });
+    }
+  }
+
+  // Método para atualizar os dados do usuário
+  static async updateUserData(req, res) {
+    const { userId } = req.params;
+    const { user, assignment } = req.body;
+
+    // Validação dos campos obrigatórios
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message: "Parâmetro userId inválido.",
+        },
+      });
+    }
+
+    if (!user || !user.id || !user.role) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message:
+            "Dados do usuário inválidos. É necessário informar 'id' e 'role'.",
+        },
+      });
+    }
+
+    if (!assignment || !assignment.activity) {
+      return res.status(400).json({
+        status: "error",
+        error: {
+          message:
+            "Dados de atribuição inválidos. É necessário informar 'id' e 'activity'.",
+        },
+      });
+    }
+
+    // Validação do UUID do userId
+    if (!validateUUID(user.id)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "O user id deve ser um UUID válido." },
+      });
+    }
+
+    // Validação do UUID do assignment id
+    if (assignment.id && !validateUUID(assignment.id)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "O assignment id deve ser um UUID válido." },
+      });
+    }
+
+    // Validação do UUID do activity id
+    if (!validateUUID(assignment.activity)) {
+      return res.status(400).json({
+        status: "error",
+        error: { message: "O assignment activity deve ser um UUID válido." },
+      });
+    }
+
+    // Construção do objeto `data`
+    const data = {
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+      assignment: {
+        id: assignment.id,
+        user: user.id,
+        activity: assignment.activity,
+      },
+    };
+
+    try {
+      // Chama o serviço de atualização com os dados validados
+      const result = await UserService.updateUserData(data);
+
+      if (result) {
+        return res.status(200).json({
+          status: "success",
+          results: result,
+        });
+      }
+
+      return res.status(201).json({
+        status: "success",
+        results: "OK",
       });
     } catch (error) {
       const statusCode = error instanceof CustomError ? error.statusCode : 500;
